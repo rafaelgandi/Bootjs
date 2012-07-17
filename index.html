@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Boot.js Test</title>  
+</head>
+<body>
+	<h1>Boot.js testing, take a peek at the js console window</h1>
+	<script src="js/jquery-1.7.2.min.js"></script>
+	<script src="js/Boot.js"></script>
+	<script>
+		new Boot()
+		.load('js/jquery.jvap.js', function () { // load jquery
+			console.log('typeof jQuery.jvap is: '+typeof jQuery.jvap);			
+			this.load('js/json2.min.js', function () { // some js that is dependent on jQuery.jvap
+				console.log('typeof JSON.stringify is: '+typeof JSON.stringify);
+			});
+		})
+		.load('js/script1.js') // load script that has no depandencies
+		.load('js/script2.js'); // load script that has no depandencies
+	</script>
+</body>
+</html>
