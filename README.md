@@ -4,10 +4,10 @@ Bootjs
 Javascript loader that uses window.localStorage for caching scripts and LAB.js for loading them.
 Dependencies: jquery and LAB.js
 <br>
-<center>
+<div align="center">
 	<img src="http://blog.rememberthemilk.com/img/ninja.png"><br>
 	<i>"A ninja must be patient and quiet in loading js files"</i>
-</center>
+</div>
 <br>
 
 <u style="font-weight: bold;">Road Map 2.0<u><br>
