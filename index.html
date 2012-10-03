@@ -9,6 +9,11 @@
 	<script src="js/jquery-1.7.2.min.js"></script>
 	<script src="js/Boot.js"></script>
 	<script>
+		var  showStorage = function () {
+			//console.clear();
+			console.warn('Local Storages');
+			console.dir(localStorage);
+		};
 		new Boot()
 		.load('js/jquery.jvap.js', function () { // load jquery
 			console.log('typeof jQuery.jvap is: '+typeof jQuery.jvap);			
@@ -17,7 +22,8 @@
 			});
 		})
 		.load('js/script1.js') // load script that has no depandencies
-		.load('js/script2.js'); // load script that has no depandencies
+		.load('js/script2.js?boot=100312.2'); // load script that has no depandencies
+		//.load('js/script2.js'); // load script that has no depandencies
 	</script>
 </body>
 </html>

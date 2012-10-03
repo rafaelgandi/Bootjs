@@ -7,114 +7,35 @@
 	Boot Loader
 		- inspired by basket.js
 		- dependencies: jquery and LAB.js
-		- LM: 10-03-12
+		- LM: 05-31-12
 	@author: Rafael Gandionco
 	
 	Links:
 		- http://www.stevesouders.com/blog/2011/03/28/storager-case-study-bing-google/
 		- http://addyosmani.github.com/basket.js/
 */
-
-// Remove Stale Stored Data //
-(function () {
-	var date = new Date(),
-		getTimestampFromKey = function (_key) {
-			var p = _key.split('~');
-			return parseInt(p[p.length-1], 10);
-		},
-		now = date.getTime(),
-		timestamp, sec;
-	for (var prop in localStorage) {
-		if (prop.indexOf('bootjs~') > -1) {
-			// todo: finish this
-			//timestamp = getTimestampFromKey(prop);
-			//sec = Math.ceil((now - timestamp) / 1000);
-			//console.log(sec);		
-			
-		}
-	}
-})();
-
 function Boot() {
 	this.hasLocalStorage = !!localStorage;
-	var key = 'bootjs~',
-		date = new Date();	
+	var key = 'BOOT_';	
 	
 	// UNCOMMENT TO RESET THE CACHE //
 	// self.localStorage.clear();
 	
-	this._log = function (_msg) {
-		if (typeof console === 'undefined') { return; }
-		console.log(_msg);
-	};
-	
-	this._basename = function (_jsPath, _alsoQueryString) {
-		var p = _jsPath.split('/'),
-			qs = _alsoQueryString || false;
-		if (qs && _jsPath.indexOf('?') > -1) {
-			// Also remove the query string if it has one. //
-			return jQuery.trim(p[(p.length-1)]).split('?')[0];
-		}	
-		return jQuery.trim(p[(p.length-1)]);		
-	};
-	
-	this._removeKeys = function (_key) {
-		return _key.split('~')[1];
-	};
-	
-	this._makeKey = function (_file) {
-		return key + this._basename(_file) + '~' + date.getTime();
-	};
-	
-	this._removeOldVersion = function (_jsPath) {
-		var filename = this._basename(_jsPath),
-			p, keyRegExp;
-		// Only update version if has "boot" query string //	
-		if (filename.indexOf('?') > -1 && filename.indexOf('boot=') > -1) {
-			p = filename.split('?');
-			keyRegExp = new RegExp('^'+key+p[0]);
-			for (var prop in localStorage) {
-				if (keyRegExp.test(prop)) {
-					if (this._removeKeys(prop) === filename) { return true; }
-					localStorage.removeItem(prop);
-					return false;
-				}
-			}
-		}
-		return true;
-	};
-	
-	this._getStoredItem = function (_file) {
-		var f = this._basename(_file, true),
-			keyRegExp = new RegExp('^'+key+f);
-		for (var prop in localStorage) {
-			if (keyRegExp.test(prop)) { return localStorage.getItem(prop); }
-		}
-		return false;
-	};
-	
 	this._inCacheThenEval = function (_jsPath) {
-		var cache = this._getStoredItem(_jsPath);
-		if (!! cache) {
-			if (this._removeOldVersion(_jsPath)) {
-				jQuery.globalEval(cache);
-				this._log(_jsPath+' has been loaded');
-				return true;	
-			}
-			return false;
+		var cache = localStorage.getItem(key+_jsPath);
+		if (!!cache) {
+			jQuery.globalEval(cache);
+			if (typeof console !== 'undefined') {console.log(_jsPath+' has been loaded');}
+			return true;
 		}
 		return false;
 	};
-	
-	this._makeCache = function (_js) {
-		var that = this;
+	this._makeCache = function (_js) {			
 		setTimeout(function () {
 			jQuery.get(_js, function (res) {
-				try { localStorage.setItem(that._makeKey(_js), res); }
-				catch(e) {
-					// See: http://sunpig.com/martin/archives/2011/05/21/considerations-for-caching-resources-in-localstorage.html
-					that._log('Cant store resource >>> '+e.message);
-				}		
+				try {
+					localStorage.setItem(key+_js, res);
+				}catch(e){}		
 			}, 'text'); // make sure to get a text version
 		}, 500);					
 	};
@@ -123,7 +44,7 @@ function Boot() {
 Boot.prototype.load = function (_js, _callback, _useCache) {
 	var js = jQuery.trim(_js),
 		USE_CACHE = true,
-		hollaback = function () {},
+		hollaback = jQuery.noop,
 		that = this;
 	if (jQuery.isFunction(_callback)) {
 		USE_CACHE = (typeof _useCache === 'undefined') ? true : false;
