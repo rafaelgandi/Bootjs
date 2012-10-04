@@ -149,7 +149,6 @@ Boot.prototype.expire = (function () {
 			if (prop.indexOf('bootjs~') > -1) {
 				sec = Math.ceil((now - getTimestampFromKey(prop)) / 1000);
 				if (sec >= ONE_MONTH) { 
-					console.log('removed '+prop);
 					localStorage.removeItem(prop);
 				}	
 			}
