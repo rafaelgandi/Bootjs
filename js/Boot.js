@@ -142,8 +142,7 @@ Boot.prototype.expire = (function () {
 			},
 			// Number of seconds in a month (31 days). 
 			// See: http://wiki.answers.com/Q/How_many_seconds_in_the_month_of_January
-			//ONE_MONTH = 2678400,
-			ONE_MONTH = 10,
+			ONE_MONTH = 2678400,
 			now = date.getTime(),
 			sec;
 		for (var prop in localStorage) {
