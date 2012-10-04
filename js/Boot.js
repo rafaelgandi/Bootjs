@@ -6,42 +6,19 @@
 /* 
 	Boot Loader
 		- inspired by basket.js
-		- dependencies: jquery and LAB.js
-		- LM: 10-03-12
+		- dependencies: jQuery and LAB.js
+		- LM: 10-04-12
 	@author: Rafael Gandionco
+	@version: 2.0
 	
 	Links:
 		- http://www.stevesouders.com/blog/2011/03/28/storager-case-study-bing-google/
 		- http://addyosmani.github.com/basket.js/
 */
-
-// Remove Stale Stored Data //
-(function () {
-	var date = new Date(),
-		getTimestampFromKey = function (_key) {
-			var p = _key.split('~');
-			return parseInt(p[p.length-1], 10);
-		},
-		now = date.getTime(),
-		timestamp, sec;
-	for (var prop in localStorage) {
-		if (prop.indexOf('bootjs~') > -1) {
-			// todo: finish this
-			//timestamp = getTimestampFromKey(prop);
-			//sec = Math.ceil((now - timestamp) / 1000);
-			//console.log(sec);		
-			
-		}
-	}
-})();
-
 function Boot() {
 	this.hasLocalStorage = !!localStorage;
 	var key = 'bootjs~',
 		date = new Date();	
-	
-	// UNCOMMENT TO RESET THE CACHE //
-	// self.localStorage.clear();
 	
 	this._log = function (_msg) {
 		if (typeof console === 'undefined') { return; }
@@ -50,12 +27,16 @@ function Boot() {
 	
 	this._basename = function (_jsPath, _alsoQueryString) {
 		var p = _jsPath.split('/'),
-			qs = _alsoQueryString || false;
+			qs = _alsoQueryString || false,
+			forwardSlash = /\//g,
+			tild = /~/g;
 		if (qs && _jsPath.indexOf('?') > -1) {
 			// Also remove the query string if it has one. //
-			return jQuery.trim(p[(p.length-1)]).split('?')[0];
+			return jQuery.trim(p[(p.length-1)]).split('?')[0].replace(forwardSlash, '')
+															 .replace(tild, '');
 		}	
-		return jQuery.trim(p[(p.length-1)]);		
+		return jQuery.trim(p[(p.length-1)]).replace(forwardSlash, '')
+										   .replace(tild, '');
 	};
 	
 	this._removeKeys = function (_key) {
@@ -88,20 +69,24 @@ function Boot() {
 		var f = this._basename(_file, true),
 			keyRegExp = new RegExp('^'+key+f);
 		for (var prop in localStorage) {
-			if (keyRegExp.test(prop)) { return localStorage.getItem(prop); }
+			if (keyRegExp.test(prop)) {
+				// Make sure that it is a  match //
+				if (this._basename(this._removeKeys(prop), true) === f) {					
+					return localStorage.getItem(prop); 
+				}				
+			}
 		}
 		return false;
 	};
 	
 	this._inCacheThenEval = function (_jsPath) {
 		var cache = this._getStoredItem(_jsPath);
-		if (!! cache) {
+		if (cache !== false) { // Must compare to false here...
 			if (this._removeOldVersion(_jsPath)) {
 				jQuery.globalEval(cache);
 				this._log(_jsPath+' has been loaded');
 				return true;	
 			}
-			return false;
 		}
 		return false;
 	};
@@ -128,26 +113,47 @@ Boot.prototype.load = function (_js, _callback, _useCache) {
 	if (jQuery.isFunction(_callback)) {
 		USE_CACHE = (typeof _useCache === 'undefined') ? true : false;
 		// See: https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Function/call
-		hollaback = function () {_callback.call(that, that)};
+		hollaback = function () {_callback.call(that, that);};
 	}
 	else {
-		if (typeof _callback !== 'undefined') {
-			USE_CACHE = !!_callback;			
-		}
+		if (typeof _callback !== 'undefined') { USE_CACHE = !!_callback; }
 	}
 	
 	if (this.hasLocalStorage && USE_CACHE) {
-		var that = this;
-		if (this._inCacheThenEval(js)) {		
-			hollaback();
-		}
+		if (this._inCacheThenEval(js)) { hollaback(); }
 		else {
 			$LAB.script(js).wait(hollaback);	
 			this._makeCache(js);
 		}
 	}
-	else {
-		$LAB.script(js).wait(hollaback);
-	}
+	else { $LAB.script(js).wait(hollaback); } // Load using $LAB js
 	return this;
 };
+
+Boot.prototype.expire = (function () {
+	// Expire Stale Stored Data //
+	// Stored scripts expires in one month//
+	if (! localStorage) { return; }; // Check if localStorage is available
+	setTimeout(function () { // Check after 1 second.
+		var date = new Date(),
+			getTimestampFromKey = function (_key) {
+				var p = _key.split('~');
+				return parseInt(p[p.length-1], 10);
+			},
+			// Number of seconds in a month (31 days). 
+			// See: http://wiki.answers.com/Q/How_many_seconds_in_the_month_of_January
+			//ONE_MONTH = 2678400,
+			ONE_MONTH = 10,
+			now = date.getTime(),
+			sec;
+		for (var prop in localStorage) {
+			if (prop.indexOf('bootjs~') > -1) {
+				sec = Math.ceil((now - getTimestampFromKey(prop)) / 1000);
+				if (sec >= ONE_MONTH) { 
+					console.log('removed '+prop);
+					localStorage.removeItem(prop);
+				}	
+			}
+		}
+	}, 1000);
+})();

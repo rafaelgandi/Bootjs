@@ -21,9 +21,12 @@
 				console.log('typeof JSON.stringify is: '+typeof JSON.stringify);
 			});
 		})
-		.load('js/script1.js') // load script that has no depandencies
-		.load('js/script2.js?boot=100312.2'); // load script that has no depandencies
-		//.load('js/script2.js'); // load script that has no depandencies
+		// load script that has no depandencies //
+		.load('js/dont_cache.js', false)
+		.load('js/jquery.someplugin.js')
+		.load('js/jquery.js')
+		.load('js/script1.js')
+		.load('js/script2.js?boot=100412.2'); // load script that has no depandencies
 	</script>
 </body>
 </html>
