@@ -7,7 +7,7 @@
 	Boot Loader
 		- inspired by basket.js
 		- dependencies: jQuery and LAB.js
-		- LM: 10-04-12
+		- LM: 10-05-12
 	@author: Rafael Gandionco
 	@version: 2.0
 	
@@ -101,7 +101,7 @@ function Boot() {
 					that._log('Cant store resource >>> '+e.message);
 				}		
 			}, 'text'); // make sure to get a text version
-		}, 500);					
+		}, 1e3);					
 	};
 }
 
@@ -130,10 +130,11 @@ Boot.prototype.load = function (_js, _callback, _useCache) {
 	return this;
 };
 
-Boot.prototype.expire = (function () {
-	// Expire Stale Stored Data //
+// Expire Stale Stored Data //
+(function () {
 	// Stored scripts expires in one month//
 	if (! localStorage) { return; }; // Check if localStorage is available
+	// See: http://googlecode.blogspot.com/2009/07/gmail-for-mobile-html5-series-using.html
 	setTimeout(function () { // Check after 1 second.
 		var date = new Date(),
 			getTimestampFromKey = function (_key) {
@@ -147,11 +148,13 @@ Boot.prototype.expire = (function () {
 			sec;
 		for (var prop in localStorage) {
 			if (prop.indexOf('bootjs~') > -1) {
-				sec = Math.ceil((now - getTimestampFromKey(prop)) / 1000);
-				if (sec >= ONE_MONTH) { 
-					localStorage.removeItem(prop);
+				sec = Math.ceil((now - getTimestampFromKey(prop)) / 1e3);
+				if (sec >= ONE_MONTH) {
+					(function (prop) {
+						setTimeout(function () { localStorage.removeItem(prop); }, 0);
+					})(prop);				
 				}	
 			}
 		}
-	}, 1000);
-})();
+	}, 1e3);
+})(); 

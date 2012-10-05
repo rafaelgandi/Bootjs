@@ -48,16 +48,22 @@
 		.load('js/webjslint.js')
 		.load('js/yui-min.js');
 		
-		new Boot()
-		.load('js/MochiKit.js')
-		.load('js/dojo.js');
+		setTimeout(function () {
+			new Boot()
+			.load('js/MochiKit.js')
+			.load('js/dojo.js');
+			console.log('AAAAAAAAAAAAAAA');
+		}, 3000);
+	
 			
 	</script>
 	<script>
-		var i = 10000
+		/** /
+		var i = 10000;
 		while (i--) {
 			jQuery('body').append('<div>'+i+'</div>');
 		}
+		/**/
 	</script>
 	<script>
 		// benchmark, See: http://calendar.perfplanet.com/2010/bulletproof-javascript-benchmarks/
