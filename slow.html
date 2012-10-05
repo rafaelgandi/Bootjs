@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Boot.js Test (Slow with script tags)</title>  
+</head>
+<body>
+	<h1>Not using Boot.js, using script tags instead</h1>
+	<script>
+		var start = new Date;
+	</script>
+	<script src="js/jquery-1.7.2.min.js"></script>
+	<!-- <script src="js/jquery.mobile-1.2.0.js"></script> -->
+	<script src="js/Boot.js"></script>
+	<script src="js/jquery.jvap.js"></script>
+	<script src="js/json2.min.js"></script>
+	<script src="js/dont_cache.js"></script>
+	<script src="js/jquery.someplugin.js"></script>
+	<script src="js/script1.js"></script>
+	<script src="js/script2.js"></script>
+	<script src="js/jquery-ui.min.js"></script>
+	<script src="js/jquery.blockUI.pak.js"></script>
+	<script src="js/easyXDM.min.js"></script>
+	<script src="js/jquery.fancybox-1.3.4.pack.js"></script>
+	<script src="js/modernizr-1.7.min.js"></script>
+	<script src="js/jquery.tools.expose.min.js"></script>
+	<script src="js/jquery.validate.min.js"></script>
+	<script src="js/jshint.js"></script>
+	<script src="js/webjslint.js"></script>
+	<script src="js/yui-min.js"></script>
+	<script src="js/MochiKit.js"></script>
+	<script src="js/dojo.js"></script>
+	<script>
+		var i = 10000
+		while (i--) {
+			jQuery('body').append('<div>'+i+'</div>');
+		}
+	</script>
+	<script>
+		// benchmark, See: http://calendar.perfplanet.com/2010/bulletproof-javascript-benchmarks/
+		console.log('BENCHMARK: '+(new Date - start));
+	</script>
+</body>
+</html>

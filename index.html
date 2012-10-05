@@ -9,11 +9,15 @@
 	<script src="js/jquery-1.7.2.min.js"></script>
 	<script src="js/Boot.js"></script>
 	<script>
+		var start = new Date; // benchmark, See: http://calendar.perfplanet.com/2010/bulletproof-javascript-benchmarks/
 		var  showStorage = function () {
-			//console.clear();
-			console.warn('Local Storages');
-			console.dir(localStorage);
-		};
+				//console.clear();
+				console.warn('Local Storages');
+				console.dir(localStorage);
+			},
+			clearAll = function () {
+				localStorage.clear();
+			};
 		new Boot()
 		.load('js/jquery.jvap.js', function () { // load jquery
 			console.log('typeof jQuery.jvap is: '+typeof jQuery.jvap);			
@@ -27,6 +31,37 @@
 		.load('js/jquery.js')
 		.load('js/script1.js')
 		.load('js/script2.js?boot=100412.2'); // load script that has no depandencies
+		
+		new Boot()
+		.load('js/jquery-ui.min.js')
+		.load('js/jquery.blockUI.pak.js')
+		.load('js/easyXDM.min.js');
+		
+		new Boot()
+		.load('js/jquery.fancybox-1.3.4.pack.js')
+		.load('js/modernizr-1.7.min.js')
+		.load('js/jquery.tools.expose.min.js')
+		.load('js/jquery.validate.min.js');
+		
+		new Boot()
+		.load('js/jshint.js')
+		.load('js/webjslint.js')
+		.load('js/yui-min.js');
+		
+		new Boot()
+		.load('js/MochiKit.js')
+		.load('js/dojo.js');
+			
+	</script>
+	<script>
+		var i = 10000
+		while (i--) {
+			jQuery('body').append('<div>'+i+'</div>');
+		}
+	</script>
+	<script>
+		// benchmark, See: http://calendar.perfplanet.com/2010/bulletproof-javascript-benchmarks/
+		console.log('BENCHMARK: '+(new Date - start));
 	</script>
 </body>
 </html>
