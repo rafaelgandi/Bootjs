@@ -15,6 +15,13 @@
 		- http://www.stevesouders.com/blog/2011/03/28/storager-case-study-bing-google/
 		- http://addyosmani.github.com/basket.js/
 */
+var BOOT_STORE = [];
+if (!!localStorage) {
+	console.log(localStorage.key(0));
+	for (var prop in localStorage) {
+		BOOT_STORE.push(prop);
+	} 
+}
 function Boot() {
 	this.hasLocalStorage = !!localStorage;
 	var key = 'bootjs~',
@@ -68,13 +75,22 @@ function Boot() {
 	this._getStoredItem = function (_file) {
 		var f = this._basename(_file, true),
 			keyRegExp = new RegExp('^'+key+f);
-		for (var prop in localStorage) {
+		console.warn('LS: '+f);
+		console.dir(BOOT_STORE);	
+		/* for (var prop in localStorage) {
 			if (keyRegExp.test(prop)) {
+				console.log('=== '+ prop);
 				// Make sure that it is a  match //
 				if (this._basename(this._removeKeys(prop), true) === f) {					
 					return localStorage.getItem(prop); 
 				}				
 			}
+		} */
+		var i = BOOT_STORE.length;
+		while (i--) {
+			if (this._basename(this._removeKeys(BOOT_STORE[i]), true) === f) {					
+				return localStorage.getItem(BOOT_STORE[i]); 
+			}		
 		}
 		return false;
 	};
@@ -93,7 +109,7 @@ function Boot() {
 	
 	this._makeCache = function (_js) {
 		var that = this;
-		setTimeout(function () {
+		//setTimeout(function () {
 			jQuery.get(_js, function (res) {
 				try { localStorage.setItem(that._makeKey(_js), res); }
 				catch(e) {
@@ -101,7 +117,7 @@ function Boot() {
 					that._log('Cant store resource >>> '+e.message);
 				}		
 			}, 'text'); // make sure to get a text version
-		}, 1e3);					
+		//}, 500);					
 	};
 }
 
@@ -157,4 +173,4 @@ Boot.prototype.load = function (_js, _callback, _useCache) {
 			}
 		}
 	}, 1e3);
-})(); 
+})();
