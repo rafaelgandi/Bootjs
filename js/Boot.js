@@ -7,7 +7,7 @@
 	Boot Loader
 		- inspired by basket.js
 		- dependencies: jQuery and LAB.js
-		- LM: 10-05-12
+		- LM: 10-08-12
 	@author: Rafael Gandionco
 	@version: 2.0
 	
@@ -15,15 +15,8 @@
 		- http://www.stevesouders.com/blog/2011/03/28/storager-case-study-bing-google/
 		- http://addyosmani.github.com/basket.js/
 */
-var BOOT_STORE = [];
-if (!!localStorage) {
-	console.log(localStorage.key(0));
-	for (var prop in localStorage) {
-		BOOT_STORE.push(prop);
-	} 
-}
 function Boot() {
-	this.hasLocalStorage = !!localStorage;
+	this.hasLocalStorage = !!localStorage; 
 	var key = 'bootjs~',
 		date = new Date();	
 	
@@ -73,25 +66,17 @@ function Boot() {
 	};
 	
 	this._getStoredItem = function (_file) {
+		if (! localStorage.length) { return false; }
 		var f = this._basename(_file, true),
 			keyRegExp = new RegExp('^'+key+f);
-		console.warn('LS: '+f);
-		console.dir(BOOT_STORE);	
-		/* for (var prop in localStorage) {
+		for (var prop in localStorage) {
 			if (keyRegExp.test(prop)) {
-				console.log('=== '+ prop);
 				// Make sure that it is a  match //
 				if (this._basename(this._removeKeys(prop), true) === f) {					
 					return localStorage.getItem(prop); 
 				}				
 			}
-		} */
-		var i = BOOT_STORE.length;
-		while (i--) {
-			if (this._basename(this._removeKeys(BOOT_STORE[i]), true) === f) {					
-				return localStorage.getItem(BOOT_STORE[i]); 
-			}		
-		}
+		}		
 		return false;
 	};
 	
@@ -109,15 +94,15 @@ function Boot() {
 	
 	this._makeCache = function (_js) {
 		var that = this;
-		//setTimeout(function () {
+		setTimeout(function () {
 			jQuery.get(_js, function (res) {
 				try { localStorage.setItem(that._makeKey(_js), res); }
 				catch(e) {
 					// See: http://sunpig.com/martin/archives/2011/05/21/considerations-for-caching-resources-in-localstorage.html
-					that._log('Cant store resource >>> '+e.message);
+					that._log('Can\'t store resource >>> '+e.message);
 				}		
 			}, 'text'); // make sure to get a text version
-		//}, 500);					
+		}, 1e3);					
 	};
 }
 
@@ -140,7 +125,7 @@ Boot.prototype.load = function (_js, _callback, _useCache) {
 		else {
 			$LAB.script(js).wait(hollaback);	
 			this._makeCache(js);
-		}
+		}		
 	}
 	else { $LAB.script(js).wait(hollaback); } // Load using $LAB js
 	return this;
